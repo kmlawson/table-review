@@ -22,3 +22,8 @@ If you click "Version to Save" the HTML and Javascript associated with the newly
 
 ##Note
 The script, uses a hosted version of Jquery, and thus requires an internet connection. You can create an entirely offline version of this script if you modify it to load a local copy of Jquery. 
+
+##Live version:
+[http://huginn.net/scripts/table-review] (http://huginn.net/scripts/table-review)
+
+(c) [Konrad M. Lawson] (http://muninn.net/). MIT License
