@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<!--
+
+TableReview Copyright (c) 2012 Konrad M. Lawson
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+Base64 Function from http://www.webtoolkit.info/ under CC BY 2.0 license
+http://code.google.com/p/stringencoders/source/browse/#svn/trunk/javascript
+Disabled double-tap-to-zoom in the table using Johan's MIT license gist here:
+https://gist.github.com/2047491
+
+-->
+
+<title>Table Review Script</title>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js">
+	</script>
+<![endif]-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js">
+	</script>
+
+	
+<style type="text/css">
+#resultTable{
+	font-family: "Georgia", Serif;
+	font-size: larger;
+	width:100%;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #414244;
+	cursor: pointer;
+}
+
+#tablediv{
+	margin-left: 25px;
+	margin-right: 20px;
+	margin-bottom: 10px;
+
+}
+#resultTable th
+{
+	padding: 7px 7px 7px 7px;
+	font-weight: normal;
+	font-size: 24px;
+	border: 1px solid #414244;
+	color: #414244;
+}
+
+#resultTable td
+{
+	padding: 7px 7px 7px 7px;
+	border: 1px solid #414244;
+	color:white;
+}
+
+.stay
+{
+	color: #4c4848;
+	cursor: pointer;
+	background: #3b3535;
+}
+
+.over
+{
+	cursor: pointer;
+	background: #7e7e80;
+	color: #4c4848;
+}
+
+a 
+{
+	color:#2d297d	
+	
+}
+
+a:hover
+{
+	color:#373639
+}
+
+h1
+{
+	margin-left: 25px;
+	margin-top: 20px;
+	margin-bottom: 15px;
+	font-family: "Georgia",Serif;
+	font-size:xx-large;
+}
+
+#about 
+{
+	color:#b6b0b0;
+	font-size: small;
+	margin-left: 25px;
+	
+}
+
+#about a
+{
+	color:#3c3d60;
+}
+
+#formdiv
+{
+	margin-left: 25px;
+	margin-right: 20px;
+}
+
+#outputlink
+{
+	margin-left: 25px;
+}
+
+#tabletitle
+{
+	margin-right: 20px;
+}
+
+#showhide
+{
+	display: none;
+	margin-left: 25px;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+@media screen and (max-device-width: 480px){
+body{
+  -webkit-text-size-adjust:none;
+  font-family:Georgia, Serif;
+  padding:5px;
+}
+}
+
+
+</style>
+
+</head>
+<body>
+
+
+<div id="pagetitle">
+<h1>Table Review Script</h1>
+</div>
+
+
+
+<div id="formdiv">
+<form action="" method="" accept-charset="utf-8" id="tableCreate">
+
+	 <div>
+	 	Table Title:<br />
+	 	<input type="text" size="40" name="tabletitle" id="tabletitle">
+	 	<br />
+	 	Table Contents:<br />
+	 	<textarea cols="40" rows="20" name="tabletext" id="tabletext"></textarea>
+	 	<br />
+	 	<input type="submit" value="Submit" id="submitform" value="Create a Table">
+	 	<br /><br />
+	 	<strong>Options:</strong><br /><br />
+	 	Column Delimiter: <input id="delimiter" type="text" size="2" value=",">
+	 	<br />
+	 	<input type="checkbox"  checked="true" id="header"> First row is a header
+	 	<br />
+	 	<input type="checkbox" checked="true" id="firstcolumn"> Leave first column visible
+	 	<br />
+	 	<input type="checkbox" checked="true" id="columnreveal"> Reveal column or row when over header
+	 	<br />
+	 	<input type="checkbox"  id="clickreveal"> Only reveal on click
+
+	 </div>
+</form>
+</div>
+
+<div id="tablediv">
+<table id="resultTable">
+</table>
+</div>
+
+<div id="showhide">
+<button id="showbutton">Show All</button>
+</div>
+
+<div id="outputlink">
+</div>
+
+<div id="about">
+TableReview Copyright (c) 2012 <a href="http://muninn.net/">K. M. Lawson</a>. MIT License.
+</div>
+
+
+<script>
+$(document).ready(function() {
+	
+	var allon = false;
+    var isiPhone = navigator.userAgent.toLowerCase().indexOf("iphone");
+    var isiPad = navigator.userAgent.toLowerCase().indexOf("ipad");
+    if ((isiPhone>-1) || (isiPad>-1)) {
+	    var iosyes = true;
+    } else {
+	    var iosyes = false;
+    }
+    $(window).load(function() {
+	    if (iosyes==true) {
+	    	$('head').append('<meta name="viewport" content="width=device-width, initial-scale=1">');
+	    } 
+	 });
+
+
+	var textForm = document.getElementById('tableCreate');
+	
+	if (textForm != null) {
+		textForm.onsubmit = convertTable;
+	}
+	
+	$("#resultTable").on("click","#resultTable td",function(e){ 
+		if (iosyes==false) {
+			$(e.target).closest('td').toggleClass('stay');
+		}
+	});
+	
+	$("#resultTable").on("touchend","#resultTable td",function(e){ 
+		$(this).toggleClass('stay');
+	});
+	
+	$("#resultTable").on("touchend","#resultTable th",function() {
+		if ($('#columnreveal').is(':checked')) {
+			$(this).parents('table').find('td:nth-child('+($(this).index()+1)+')').toggleClass('stay');
+			$(this).parents('tr').find('td').toggleClass('stay');
+		}
+	});
+	
+	$("#resultTable").on("hover","#resultTable td",
+	function(event){
+		if (!$('#clickreveal').is(':checked') && iosyes==false) {
+			$(this).closest('td').toggleClass('over');
+		}
+	},
+	function(event){
+		if (!$('#clickreveal').is(':checked') && iosyes==false) {
+			$(this).closest('td').toggleClass('over');
+		}
+	}
+	);
+	
+	$("#resultTable").on("hover","#resultTable th",
+	function(){
+		if ($('#columnreveal').is(':checked') && iosyes==false) {
+			$(this).parents('table').find('td:nth-child('+($(this).index()+1)+')').toggleClass('stay');
+			$(this).parents('tr').find('td').toggleClass('stay');
+		}
+	}
+	);
+	
+	$("#showbutton").click(function(){
+		if (allon==false) {
+			$('#resultTable td').addClass('stay');
+			$('#showbutton').text('Hide All');
+			allon=true;
+		} else {
+			$('#resultTable td').removeClass('stay');
+			$('#showbutton').text('Show All');
+			allon=false;
+		} 
+	});
+	
+
+	//Thanks to johan and his MIT licensed gist at gist.github.com/2047491
+	//disable double tap function:
+
+		(function($) {
+	  var IS_IOS = /iphone|ipad/i.test(navigator.userAgent);
+	  $.fn.nodoubletapzoom = function() {
+	    if (IS_IOS)
+	      $(this).bind('touchstart', function preventZoom(e) {
+	        var t2 = e.timeStamp
+	          , t1 = $(this).data('lastTouch') || t2
+	          , dt = t2 - t1
+	          , fingers = e.originalEvent.touches.length;
+	        $(this).data('lastTouch', t2);
+	        if (!dt || dt > 500 || fingers > 1) return; // not double-tap
+	
+	        e.preventDefault(); // double tap - prevent the zoom
+	        // also synthesize click events we just swallowed up
+	        $(this).trigger('click').trigger('click');
+	      });
+	  };
+	})(jQuery);
+
+	//disable double tab within the reviewed table:
+	$('#resultTable').nodoubletapzoom();
+	
+		
+
+	function col(column) {
+		return '<td>'+column+'</td>';
+	}
+	
+	function row(row) {
+		return '<tr>'+row+'</tr>';
+	}
+	
+	function headcol(column) {
+		return '<th>'+column+'</th>';
+	}
+		
+		
+	function convertTable() {
+		var tableText = document.getElementById('tabletext').value;
+		var resultTable = document.getElementById('resultTable');
+		var formDiv = document.getElementById('formdiv');
+		var delimiter = document.getElementById('delimiter').value;
+		
+		var tableRows = tableText.split(/\n/);
+		
+		for (var x = 0; x<tableRows.length; x++) {
+			var rowBuild = '';
+			var tableCols = tableRows[x].split(delimiter);
+			for (var y = 0; y<tableCols.length; y++) {
+				if ((x==0) && ($('#header').is(':checked'))) {
+					rowBuild+=headcol(tableCols[y]);
+				} else {
+					if ((y==0) && ($('#firstcolumn').is(':checked'))) {
+						rowBuild+=headcol(tableCols[y]);
+					} else {
+					 	rowBuild+=col(tableCols[y]);
+					}
+	
+				}
+			}
+			resultTable.innerHTML+=row(rowBuild);
+		}
+		$("#about").remove();
+		$("#pagetitle").html("<h1>"+$("#tabletitle").val()+"</h1>");
+		
+		$('#formdiv').css("display","none");
+		$('#showhide').css("display","block");
+				
+		$('#outputlink').append("<a href='javascript:document.location=\"data:text/html;charset=utf-8;base64,"+Base64.encode($("html").clone().html())+"\";'>Version to Save</a>");
+	
+		return false;
+	}
+
+/**
+*
+*  Base64 encode / decode
+*  http://www.webtoolkit.info/
+*
+**/
+ 
+var Base64 = {
+ 
+	// private property
+	_keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+ 
+	// public method for encoding
+	encode : function (input) {
+		var output = "";
+		var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+		var i = 0;
+ 
+		input = Base64._utf8_encode(input);
+ 
+		while (i < input.length) {
+ 
+			chr1 = input.charCodeAt(i++);
+			chr2 = input.charCodeAt(i++);
+			chr3 = input.charCodeAt(i++);
+ 
+			enc1 = chr1 >> 2;
+			enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+			enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+			enc4 = chr3 & 63;
+ 
+			if (isNaN(chr2)) {
+				enc3 = enc4 = 64;
+			} else if (isNaN(chr3)) {
+				enc4 = 64;
+			}
+ 
+			output = output +
+			this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+			this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+ 
+		}
+ 
+		return output;
+	},
+ 
+	// public method for decoding
+	decode : function (input) {
+		var output = "";
+		var chr1, chr2, chr3;
+		var enc1, enc2, enc3, enc4;
+		var i = 0;
+ 
+		input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+ 
+		while (i < input.length) {
+ 
+			enc1 = this._keyStr.indexOf(input.charAt(i++));
+			enc2 = this._keyStr.indexOf(input.charAt(i++));
+			enc3 = this._keyStr.indexOf(input.charAt(i++));
+			enc4 = this._keyStr.indexOf(input.charAt(i++));
+ 
+			chr1 = (enc1 << 2) | (enc2 >> 4);
+			chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+			chr3 = ((enc3 & 3) << 6) | enc4;
+ 
+			output = output + String.fromCharCode(chr1);
+ 
+			if (enc3 != 64) {
+				output = output + String.fromCharCode(chr2);
+			}
+			if (enc4 != 64) {
+				output = output + String.fromCharCode(chr3);
+			}
+ 
+		}
+ 
+		output = Base64._utf8_decode(output);
+ 
+		return output;
+ 
+	},
+ 
+	// private method for UTF-8 encoding
+	_utf8_encode : function (string) {
+		string = string.replace(/\r\n/g,"\n");
+		var utftext = "";
+ 
+		for (var n = 0; n < string.length; n++) {
+ 
+			var c = string.charCodeAt(n);
+ 
+			if (c < 128) {
+				utftext += String.fromCharCode(c);
+			}
+			else if((c > 127) && (c < 2048)) {
+				utftext += String.fromCharCode((c >> 6) | 192);
+				utftext += String.fromCharCode((c & 63) | 128);
+			}
+			else {
+				utftext += String.fromCharCode((c >> 12) | 224);
+				utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+				utftext += String.fromCharCode((c & 63) | 128);
+			}
+ 
+		}
+ 
+		return utftext;
+	},
+ 
+	// private method for UTF-8 decoding
+	_utf8_decode : function (utftext) {
+		var string = "";
+		var i = 0;
+		var c = c1 = c2 = 0;
+ 
+		while ( i < utftext.length ) {
+ 
+			c = utftext.charCodeAt(i);
+ 
+			if (c < 128) {
+				string += String.fromCharCode(c);
+				i++;
+			}
+			else if((c > 191) && (c < 224)) {
+				c2 = utftext.charCodeAt(i+1);
+				string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+				i += 2;
+			}
+			else {
+				c2 = utftext.charCodeAt(i+1);
+				c3 = utftext.charCodeAt(i+2);
+				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+				i += 3;
+			}
+ 
+		}
+ 
+		return string;
+	}
+ 
+}
+	
+		
+
+});
+</script>
+</body>
+</html>
