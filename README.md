@@ -20,10 +20,28 @@ After creating a table for review, all information in the table will be hidden u
 
 If you click "Version to Save" the HTML and Javascript associated with the newly created table will be loaded in a way that allows you to File->Save the table as an HTML file which you can load whenever you wish to review the table again. You can also incorporate the resulting HTML file into your own website. 
 
+##Suggestions
+
+Some suggestions for improving or building on this script:
+
+* Build this into a Moodle or Wordpress plug-in so that tables can be embedded easily into language class exercises or blogs.
+* Build an independent database and hosting component around this script and others so that users don't need to save the resulting table.
+* Tweak: Change the column and row mouseover so that instead of reversing the display of cells, turns them all on or off (currently, if a cell has been revealed, it will be hidden on header mouseover)
+* Tweak: Make the tables display nicely on very small browsers such as phones (most table already display fine on larger tablets)
+
 ##Note
 The script, uses a hosted version of Jquery, and thus requires an internet connection. You can create an entirely offline version of this script if you modify it to load a local copy of Jquery. 
 
 ##Live version:
 [http://huginn.net/scripts/table-review] (http://huginn.net/scripts/table-review)
+
+*Example data for a table:*
+    Irregular Verbs,Essere,Avere,Stare,Andare,Fare,Bere,Uscire,Giocare
+    Io,sono,ho,sto,vado,faccio,bevo,esco,gioco
+    Tu,sei,hai,stai,vai,fai,bevi,esci,giochi
+    Lui/Lei,è,ha,sta,va,fa,beve,esce,gioca
+    Noi,siamo,abbiamo,stiamo,andiamo,facciamo,beviamo,usciamo,giochiamo
+    Voi,siete,avete,state,andate,fate,bevete,uscite,giocate
+    Loro,sono,hanno,stanno,vanno,fanno,bevono,escono,giocano
 
 (c) [Konrad M. Lawson] (http://muninn.net/). MIT License
