@@ -1,7 +1,7 @@
 # Table Review Script
 
 ## Introduction
-This script helps you review a table of information. It is useful for studying grammar rules when learning a new language or reviewing other reference tables of information that contain closely related materials. Rather than reviewing each component fact in a separate flashcard, table review allows you to see facts in relation to others they are related to. 
+This script helps you review a table of information. It is useful for studying grammar rules when learning a new language or reviewing other reference tables of information that contain closely related materials. Rather than reviewing each component fact in a separate flashcard, table review allows you to see facts in context with others they are related to. 
 
 ##Creating a Review Table
 Load the script and enter your table into the "Table Contents" field, along with an optional title for the table. Separate the columns of the table with a delimiter, which by default is a comma. For example:
