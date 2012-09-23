@@ -36,6 +36,7 @@ The script, uses a hosted version of Jquery, and thus requires an internet conne
 [http://huginn.net/scripts/table-review] (http://huginn.net/scripts/table-review)
 
 *Example data for a table:*
+
     Irregular Verbs,Essere,Avere,Stare,Andare,Fare,Bere,Uscire,Giocare
     Io,sono,ho,sto,vado,faccio,bevo,esco,gioco
     Tu,sei,hai,stai,vai,fai,bevi,esci,giochi
